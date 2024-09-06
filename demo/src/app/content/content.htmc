@@ -1,0 +1,6 @@
+@name 'app-content';
+@style './content.css';
+
+
+
+<div class="hello"></div>

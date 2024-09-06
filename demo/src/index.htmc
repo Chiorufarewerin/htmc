@@ -1,3 +1,8 @@
+@name 'root';
+@import './app/header/header.htmc';
+@import './app/content/content.htmc';
+@style './styles.css';
+
 <!doctype html>
 <html lang="en">
   <head>
@@ -16,6 +21,11 @@
     <meta name="theme-color" content="#ffffff" />
   </head>
   <body>
-
+    <header app-header>
+    </header>
+    <div class="content">
+      <app-content>
+      </app-content>
+    </div>
   </body>
 </html>

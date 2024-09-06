@@ -1,41 +1,22 @@
 const fs = require("fs");
 const path = require("path");
+const HTMLParser = require("node-html-parser");
+const CSS = require("css");
+const CSSWhat = require("css-what");
+const assert = require("./assert");
 
-/**
- * @param {string} dir
- * @param {string} appendDir
- * @param {string[]} paths
- * @returns {string[]}
- */
-function getFiles(dir, appendDir = "", paths = []) {
-  for (const name of fs.readdirSync(path.resolve(dir))) {
-    const element = `${dir}/${name}`;
-    const stat = fs.lstatSync(path.resolve(element));
-    if (stat.isDirectory()) {
-      getFiles(element, appendDir ? `${appendDir}/${name}` : name, paths);
-    } else if (stat.isFile()) {
-      paths.push(appendDir ? `${appendDir}/${name}` : name);
-    }
-  }
-
-  return paths;
+let unicId = 1;
+function getUnicId() {
+  return `_htmc-${unicId++}`;
 }
 
 /**
- * @param {string} inputDir
- * @param {string} outputDir
- * @param {string[]} files
- * @returns {void}
+ *
+ * @param {string} filePath
+ * @returns {string}
  */
-function copyFiles(inputDir, outputDir, files) {
-  for (const file of files) {
-    const filePath = path.resolve(`${inputDir}/${file}`);
-    const newFilePath = path.resolve(`${outputDir}/${file}`);
-    const newDirPath = path.dirname(newFilePath);
-
-    fs.mkdirSync(newDirPath, { recursive: true });
-    fs.copyFileSync(filePath, newFilePath);
-  }
+function getFileContent(filePath) {
+  return fs.readFileSync(path.resolve(filePath), "utf-8");
 }
 
 /**
@@ -52,16 +33,208 @@ function removeFiles(dir) {
 }
 
 /**
+ * @param {string} file
+ * @param {string} content
+ * @returns {void}
+ */
+function createFile(file, content) {
+  const filePath = path.resolve(file);
+  const dirPath = path.dirname(filePath);
+
+  fs.mkdirSync(dirPath, { recursive: true });
+  fs.writeFileSync(filePath, content, "utf-8");
+}
+
+/**
+ * @typedef {Object} Node
+ * @property {string} id
+ * @property {string} name
+ * @property {string} style
+ * @property {HTMLParser.HTMLElement} element
+ * @property {Record<string, Node>} imports
+ */
+
+/**
+ * @param {string} filePath
+ * @param {HTMLParser.HTMLElement} element
+ * @returns {Node}
+ */
+function getNode(filePath, element) {
+  const dirPath = filePath.split("/").slice(0, -1).join("/");
+
+  let name = "";
+  let style = "";
+  /** @type {Record<string, Node>} */
+  let imports = {};
+
+  if (element.firstChild && element.firstChild instanceof HTMLParser.TextNode) {
+    /** @type {string[]} */
+    const content = [];
+    for (const row of element.firstChild.text.split("\n")) {
+      if (!row) {
+        continue;
+      }
+
+      if (row.startsWith("@")) {
+        if (row.startsWith("@name")) {
+          name = row.split("'")[1];
+        } else if (row.startsWith("@style")) {
+          const file = row.split("'")[1].replace("./", "");
+          style = getFileContent(`${dirPath}/${file}`);
+        } else if (row.startsWith("@import")) {
+          const file = row.split("'")[1].replace("./", "");
+          const content = getFileContent(`${dirPath}/${file}`);
+          const node = getNode(`${dirPath}/${file}`, HTMLParser.parse(content));
+          imports[node.name] = node;
+        } else {
+          throw Error(`Unexpected property: ${row}`);
+        }
+        continue;
+      }
+      if (row) {
+        content.push(row);
+      }
+    }
+    if (content.length) {
+      element.firstChild.rawText = content.join("\n");
+    } else {
+      element.firstChild.remove();
+    }
+  }
+
+  return { id: getUnicId(), name, style, imports, element };
+}
+
+/**
+ * @param {CSS.StyleRules} styleRules
+ * @param {Node} node
+ * @returns {void}
+ */
+function getStyle(styleRules, node) {
+  const elementStylesheet = CSS.parse(node.style);
+  if (!elementStylesheet.stylesheet) {
+    return;
+  }
+  for (const rule of elementStylesheet.stylesheet.rules) {
+    if (rule.type === "rule" && "selectors" in rule && rule.selectors) {
+      for (let i = 0; i < rule.selectors.length; i++) {
+        const selector = CSSWhat.parse(rule.selectors[i]);
+        for (const s of selector) {
+          s.push({
+            type: CSSWhat.SelectorType.Attribute,
+            name: node.id,
+            action: CSSWhat.AttributeAction.Exists,
+            value: "",
+            namespace: null,
+            ignoreCase: null,
+          });
+        }
+        rule.selectors[i] = CSSWhat.stringify(selector);
+      }
+    }
+    styleRules.rules.push(rule);
+  }
+}
+
+/**
+ * @param {Node} root
+ * @returns {string}
+ */
+function getStyleRoot(root) {
+  const stylesheet = CSS.parse(root.style);
+  if (!stylesheet.stylesheet) {
+    throw Error("stylesheet for root node is not found");
+  }
+  for (const node of Object.values(root.imports)) {
+    getStyle(stylesheet.stylesheet, node);
+  }
+
+  return CSS.stringify(stylesheet);
+}
+
+/**
+ *
+ * @param {HTMLParser.HTMLElement} element
+ * @param {Node} node
+ */
+function getHtml(element, node) {
+  if (!element.rawAttrs.includes(node.id)) {
+    element.rawAttrs += ` ${node.id}`;
+  }
+
+  for (const elem of node.element.childNodes) {
+    if (elem instanceof HTMLParser.HTMLElement) {
+      if (elem.rawTagName in node.imports) {
+        getHtml(elem, node.imports[elem.rawTagName]);
+      } else if (elem.rawAttrs) {
+        for (const attr of elem.rawAttrs.split(" ")) {
+          if (attr in node.imports) {
+            getHtml(elem, node.imports[attr]);
+          }
+        }
+      } else {
+        const childNodes = elem.childNodes;
+        elem.childNodes = [];
+
+        for (const childNode of childNodes) {
+          if (childNode instanceof HTMLParser.HTMLElement) {
+            getHtml(elem, { ...node, element: childNode });
+          }
+          elem.childNodes.push(childNode);
+        }
+      }
+
+      element.childNodes.push(elem);
+    }
+  }
+}
+
+/**
+ * @param {Node} root
+ * @returns {string}
+ */
+function getHtmlRoot(root) {
+  const body = root.element.getElementsByTagName("body")[0];
+  assert(body);
+  for (const elem of body.childNodes) {
+    if (elem instanceof HTMLParser.HTMLElement) {
+      if (elem.rawTagName in root.imports) {
+        getHtml(elem, root.imports[elem.rawTagName]);
+      } else if (elem.rawAttrs) {
+        for (const attr of elem.rawAttrs.split(" ")) {
+          if (attr in root.imports) {
+            getHtml(elem, root.imports[attr]);
+          }
+        }
+      }
+    }
+  }
+
+  return root.element.toString();
+}
+
+/**
  * @param {string} input
  * @param {string} output
  * @returns {void}
  */
 function compile(input, output) {
-  const inputFiles = getFiles(input);
-  removeFiles(output);
-  copyFiles(input, output, inputFiles);
+  const content = getFileContent(input);
+  const root = getNode(input, HTMLParser.parse(content));
 
-  return;
+  const headElement = root.element.getElementsByTagName("head")[0];
+  assert(headElement);
+  const style = new HTMLParser.HTMLElement("style", {});
+  style.textContent = getStyleRoot(root);
+  headElement.appendChild(style);
+
+  removeFiles(output);
+  let html = getHtmlRoot(root);
+  try {
+    const prettier = require("@prettier/sync");
+    html = prettier.format(html, { parser: "html" });
+  } catch (e) {}
+  createFile(`${output}/index.html`, html);
 }
 
 module.exports = { compile };

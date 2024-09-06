@@ -1,0 +1,18 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+}
+
+body {
+  font-family: sans-serif;
+}
+
+section:not(#home, :target, :has(section:target)),
+:root:has(section:target:not(#home)) #home {
+  display: none;
+}

@@ -1,6 +1,6 @@
 {
   "name": "htmc-cli",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "The tool that allows you to generate a static HTML site from different structured parts.",
   "main": "src/index.js",
   "bin": {
@@ -8,7 +8,7 @@
   },
   "scripts": {
     "test": "tsc --noEmit && prettier . --check",
-    "compile-demo": "node src/index.js compile -i demo/src -o demo/dist"
+    "compile-demo": "node src/index.js compile -i demo/src/index.htmc -o demo/dist"
   },
   "repository": {
     "type": "git",
@@ -29,8 +29,17 @@
     "src/*"
   ],
   "devDependencies": {
+    "@types/css": "^0.0.37",
     "@types/node": "^22.5.4",
     "prettier": "^3.3.3",
     "typescript": "^5.5.4"
+  },
+  "dependencies": {
+    "css": "^3.0.0",
+    "css-what": "^6.1.0",
+    "node-html-parser": "^6.1.13"
+  },
+  "optionalDependencies": {
+    "@prettier/sync": "^0.5.2"
   }
 }
