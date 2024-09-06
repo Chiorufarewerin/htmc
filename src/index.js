@@ -3,7 +3,7 @@
 const { compile } = require("./compiler");
 
 function getHelpMessage() {
-  return `usage: htmc compile -i src/index.htmc -o dist
+  return `usage: htmc compile -i src/index.html -o dist
 
 options:
 
@@ -12,7 +12,7 @@ options:
 compile options:
 
   -i, --input     Input file.
-                  Defaults to "src/index.htmc"
+                  Defaults to "src/index.html"
   -o, --output    Output directory.
                   Defaults to "dist"
 `;
@@ -32,7 +32,7 @@ function main() {
     return;
   }
 
-  let input = "src/index.htmc";
+  let input = "src/index.html";
   let output = "dist";
 
   /** @type {string[]} */

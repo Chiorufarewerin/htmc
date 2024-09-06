@@ -8,7 +8,7 @@
   },
   "scripts": {
     "test": "tsc --noEmit && prettier . --check",
-    "compile-demo": "node src/index.js compile -i demo/src/index.htmc -o demo/dist"
+    "compile-demo": "node src/index.js compile -i demo/src/index.html -o demo/dist"
   },
   "repository": {
     "type": "git",

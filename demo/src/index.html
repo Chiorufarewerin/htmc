@@ -1,6 +1,7 @@
+<!-- prettier-ignore -->
 @name 'root';
-@import './app/header/header.htmc';
-@import './app/content/content.htmc';
+@import './app/header/header.html';
+@import './app/content/content.html';
 @style './styles.css';
 
 <!doctype html>
@@ -21,11 +22,7 @@
     <meta name="theme-color" content="#ffffff" />
   </head>
   <body>
-    <header app-header>
-    </header>
-    <div class="content">
-      <app-content>
-      </app-content>
-    </div>
+    <header app-header></header>
+    <app-content></app-content>
   </body>
 </html>

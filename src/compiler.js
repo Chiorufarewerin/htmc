@@ -118,9 +118,37 @@ function getStyle(styleRules, node) {
   for (const rule of elementStylesheet.stylesheet.rules) {
     if (rule.type === "rule" && "selectors" in rule && rule.selectors) {
       for (let i = 0; i < rule.selectors.length; i++) {
-        const selector = CSSWhat.parse(rule.selectors[i]);
-        for (const s of selector) {
-          s.push({
+        const selectors = CSSWhat.parse(rule.selectors[i]);
+        for (const nestedSelectors of selectors) {
+          for (let i = 0; i < nestedSelectors.length; i++) {
+            const nestedSelector = nestedSelectors[i];
+            if (nestedSelector.type === CSSWhat.SelectorType.Pseudo && nestedSelector.name === "host" && node.name) {
+              nestedSelectors[i] = {
+                type: CSSWhat.SelectorType.Pseudo,
+                name: "is",
+                data: [
+                  [
+                    {
+                      type: CSSWhat.SelectorType.Attribute,
+                      name: node.name,
+                      action: CSSWhat.AttributeAction.Exists,
+                      value: "",
+                      namespace: null,
+                      ignoreCase: null,
+                    },
+                  ],
+                  [
+                    {
+                      type: CSSWhat.SelectorType.Tag,
+                      name: node.name,
+                      namespace: null,
+                    },
+                  ],
+                ],
+              };
+            }
+          }
+          nestedSelectors.push({
             type: CSSWhat.SelectorType.Attribute,
             name: node.id,
             action: CSSWhat.AttributeAction.Exists,
@@ -129,7 +157,7 @@ function getStyle(styleRules, node) {
             ignoreCase: null,
           });
         }
-        rule.selectors[i] = CSSWhat.stringify(selector);
+        rule.selectors[i] = CSSWhat.stringify(selectors);
       }
     }
     styleRules.rules.push(rule);
@@ -154,11 +182,11 @@ function getStyleRoot(root) {
 
 /**
  *
- * @param {HTMLParser.HTMLElement} element
+ * @param {HTMLParser.HTMLElement | null} element
  * @param {Node} node
  */
 function getHtml(element, node) {
-  if (!element.rawAttrs.includes(node.id)) {
+  if (element && node.name !== "root" && !element.rawAttrs.includes(node.id)) {
     element.rawAttrs += ` ${node.id}`;
   }
 
@@ -166,26 +194,21 @@ function getHtml(element, node) {
     if (elem instanceof HTMLParser.HTMLElement) {
       if (elem.rawTagName in node.imports) {
         getHtml(elem, node.imports[elem.rawTagName]);
-      } else if (elem.rawAttrs) {
-        for (const attr of elem.rawAttrs.split(" ")) {
+      } else if (Object.keys(elem.attributes).some((attr) => attr in node.imports)) {
+        for (const attr of Object.keys(elem.attributes)) {
           if (attr in node.imports) {
             getHtml(elem, node.imports[attr]);
           }
         }
       } else {
-        const childNodes = elem.childNodes;
+        const elemCloned = elem.clone();
         elem.childNodes = [];
-
-        for (const childNode of childNodes) {
-          if (childNode instanceof HTMLParser.HTMLElement) {
-            getHtml(elem, { ...node, element: childNode });
-          }
-          elem.childNodes.push(childNode);
+        if (elemCloned instanceof HTMLParser.HTMLElement) {
+          getHtml(elem, { ...node, element: elemCloned });
         }
       }
-
-      element.childNodes.push(elem);
     }
+    element?.childNodes.push(elem);
   }
 }
 
@@ -196,19 +219,8 @@ function getHtml(element, node) {
 function getHtmlRoot(root) {
   const body = root.element.getElementsByTagName("body")[0];
   assert(body);
-  for (const elem of body.childNodes) {
-    if (elem instanceof HTMLParser.HTMLElement) {
-      if (elem.rawTagName in root.imports) {
-        getHtml(elem, root.imports[elem.rawTagName]);
-      } else if (elem.rawAttrs) {
-        for (const attr of elem.rawAttrs.split(" ")) {
-          if (attr in root.imports) {
-            getHtml(elem, root.imports[attr]);
-          }
-        }
-      }
-    }
-  }
+
+  getHtml(null, { ...root, element: body });
 
   return root.element.toString();
 }
@@ -232,7 +244,7 @@ function compile(input, output) {
   let html = getHtmlRoot(root);
   try {
     const prettier = require("@prettier/sync");
-    html = prettier.format(html, { parser: "html" });
+    html = prettier.format(html, { parser: "html", printWidth: 10000 });
   } catch (e) {}
   createFile(`${output}/index.html`, html);
 }
