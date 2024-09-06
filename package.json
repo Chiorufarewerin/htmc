@@ -8,7 +8,16 @@
   },
   "scripts": {
     "test": "tsc --noEmit && prettier . --check",
-    "compile-demo": "node src/index.js compile -i demo/src/index.html -o demo/dist"
+    "compile-demo": "node src/index.js compile -i demo/src/index.html -o demo/dist",
+    "watch": "npm-watch"
+  },
+  "watch": {
+    "compile-demo": {
+      "patterns": [
+        "demo/src"
+      ],
+      "extensions": "html,css"
+    }
   },
   "repository": {
     "type": "git",
@@ -31,6 +40,7 @@
   "devDependencies": {
     "@types/css": "^0.0.37",
     "@types/node": "^22.5.4",
+    "npm-watch": "^0.13.0",
     "prettier": "^3.3.3",
     "typescript": "^5.5.4"
   },

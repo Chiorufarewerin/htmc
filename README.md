@@ -8,6 +8,21 @@ The tool that allows you to generate a static HTML site from different structure
 
 ## Usage
 
+```
+usage: htmc compile -i src/index.html -o dist
+
+options:
+
+  -h, --help      Prints CLI usage,
+
+compile options:
+
+  -i, --input     Input file.
+                  Defaults to "src/index.html"
+  -o, --output    Output directory.
+                  Defaults to "dist"
+```
+
 ## Contributing
 
 Pull requests are welcome. For major changes, please open an issue first
