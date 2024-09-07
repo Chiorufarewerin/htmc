@@ -112,10 +112,7 @@ function getNode(filePath, element) {
  */
 function getStyle(styleRules, node) {
   const elementStylesheet = CSS.parse(node.style);
-  if (!elementStylesheet.stylesheet) {
-    return;
-  }
-  for (const rule of elementStylesheet.stylesheet.rules) {
+  for (const rule of elementStylesheet.stylesheet?.rules || []) {
     if (rule.type === "rule" && "selectors" in rule && rule.selectors) {
       for (let i = 0; i < rule.selectors.length; i++) {
         const selectors = CSSWhat.parse(rule.selectors[i]);
@@ -173,6 +170,9 @@ function getStyle(styleRules, node) {
       }
     }
     styleRules.rules.push(rule);
+  }
+  for (const n of Object.values(node.imports)) {
+    getStyle(styleRules, n);
   }
 }
 
