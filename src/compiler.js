@@ -204,14 +204,23 @@ function getHtml(element, node) {
 
   for (const elem of node.element.childNodes) {
     if (elem instanceof HTMLParser.HTMLElement) {
-      if (elem.rawTagName in node.imports) {
-        getHtml(elem, node.imports[elem.rawTagName]);
-      } else if (Object.keys(elem.attributes).some((attr) => attr in node.imports)) {
+      const tagName = (() => {
+        if (elem.rawTagName in node.imports) {
+          return elem.rawTagName;
+        }
         for (const attr of Object.keys(elem.attributes)) {
           if (attr in node.imports) {
-            getHtml(elem, node.imports[attr]);
+            return attr;
           }
         }
+        return null;
+      })();
+
+      if (tagName) {
+        if (node && node.name !== "root" && !elem.rawAttrs.includes(node.id)) {
+          elem.rawAttrs += ` ${node.id}`;
+        }
+        getHtml(elem, node.imports[tagName]);
       } else {
         const elemCloned = elem.clone();
         elem.childNodes = [];
