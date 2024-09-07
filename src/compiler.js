@@ -148,7 +148,19 @@ function getStyle(styleRules, node) {
               };
             }
           }
-          nestedSelectors.push({
+
+          let index = 0;
+          for (; index < nestedSelectors.length; index++) {
+            const nestedSelector = nestedSelectors[i];
+            if (
+              nestedSelector.type === CSSWhat.SelectorType.Attribute ||
+              nestedSelector.type === CSSWhat.SelectorType.Tag
+            ) {
+              break;
+            }
+          }
+
+          nestedSelectors.splice(i + 1, 0, {
             type: CSSWhat.SelectorType.Attribute,
             name: node.id,
             action: CSSWhat.AttributeAction.Exists,
@@ -230,6 +242,26 @@ function getHtmlRoot(root) {
  * @param {string} output
  * @returns {void}
  */
+function copyAssets(input, output) {
+  const inputDir = input.split("/").slice(0, -1).join("/");
+  const faviconIcoSource = path.resolve(inputDir, "favicon.ico");
+  const assetsDirSource = path.resolve(inputDir, "assets");
+  const faviconIcoOutput = path.resolve(output, "favicon.ico");
+  const assetsDirOutput = path.resolve(output, "assets");
+
+  if (fs.existsSync(faviconIcoSource)) {
+    fs.cpSync(faviconIcoSource, faviconIcoOutput);
+  }
+  if (fs.existsSync(assetsDirSource)) {
+    fs.cpSync(assetsDirSource, assetsDirOutput, { recursive: true });
+  }
+}
+
+/**
+ * @param {string} input
+ * @param {string} output
+ * @returns {void}
+ */
 function compile(input, output) {
   const content = getFileContent(input);
   const root = getNode(input, HTMLParser.parse(content));
@@ -247,6 +279,7 @@ function compile(input, output) {
     html = prettier.format(html, { parser: "html", printWidth: 10000 });
   } catch (e) {}
   createFile(`${output}/index.html`, html);
+  copyAssets(input, output);
 }
 
 module.exports = { compile };

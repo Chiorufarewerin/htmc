@@ -14,9 +14,10 @@
   "watch": {
     "compile-demo": {
       "patterns": [
+        "src",
         "demo/src"
       ],
-      "extensions": "html,css"
+      "extensions": "html,css,js"
     }
   },
   "repository": {

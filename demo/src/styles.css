@@ -1,3 +1,30 @@
+:root {
+  --background-base: #fff;
+  --background-base-alt: #f6f6f6;
+  --background-neutral: rgb(0 0 0 / 4%);
+  --background-neutral-hover: rgb(0 0 0 / 8%);
+  --background-neutral-pressed: rgba(0, 0, 0, 0.12);
+  --border-normal: rgb(0 0 0 / 10%);
+  --border-hover: rgb(0 0 0 / 16%);
+  --border-focus: rgb(51 51 51 / 64%);
+  --status-negative: rgb(244 87 37 / 100%);
+  --status-negative-pale: rgb(244 87 37 / 12%);
+  --status-negative-pale-hover: rgb(244 87 37 / 24%);
+  --status-positive: rgb(74 201 155 / 100%);
+  --status-positive-pale: rgb(74 201 155 / 12%);
+  --status-positive-pale-hover: rgb(74 201 155 / 24%);
+  --status-warning: rgb(255 199 0 / 100%);
+  --status-warning-pale: rgb(255 199 0 / 12%);
+  --status-warning-pale-hover: rgb(255 199 0 / 24%);
+  --status-info: rgb(112 182 246 / 100%);
+  --status-info-pale: rgb(112 182 246 / 12%);
+  --status-info-pale-hover: rgb(112 182 246 / 24%);
+  --status-neutral: rgb(121 129 140);
+  --text-primary: rgb(27 31 59 / 100%);
+  --text-secondary: rgb(27 31 59 / 65%);
+  --text-tertiary: rgb(27 31 59 / 40%);
+}
+
 *,
 *::before,
 *::after {
@@ -10,6 +37,7 @@
 
 body {
   font-family: sans-serif;
+  background-color: var(--background-base);
 }
 
 section:not(#home, :target, :has(section:target)),
