@@ -16,7 +16,9 @@
   justify-content: space-between;
   align-items: center;
   height: 3rem;
-  padding: 0 6rem;
+  padding: 0 2rem;
+  max-width: 72rem;
+  margin: 0 auto;
 }
 
 img {
@@ -33,7 +35,6 @@ a {
   padding: 0.5rem;
   border-radius: 0.75rem;
   text-decoration: none;
-  color: var(--text-primary);
   font-family: "Roboto", "Segoe UI", "Helvetica Neue", sans-serif;
   font-weight: bold;
 }

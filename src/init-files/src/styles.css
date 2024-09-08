@@ -1,0 +1,13 @@
+/*
+  Here you can put any global styles you like
+*/
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+}

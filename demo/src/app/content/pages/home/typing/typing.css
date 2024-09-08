@@ -1,0 +1,34 @@
+:host {
+  height: 10rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.typing-effect {
+  width: 21ch;
+  animation:
+    app-typing 2s steps(21),
+    app-typing-effect 0.5s step-end infinite alternate;
+  white-space: nowrap;
+  overflow: hidden;
+  border-right: 3px solid;
+  font-family: monospace;
+  font-size: 2rem;
+}
+
+.typing-effect::after {
+  content: "if you need just HTML";
+}
+
+@keyframes app-typing {
+  from {
+    width: 0;
+  }
+}
+
+@keyframes app-typing-effect {
+  50% {
+    border-color: transparent;
+  }
+}

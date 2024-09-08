@@ -1,9 +1,13 @@
 #!/usr/bin/env node
 
 const { compile } = require("./compiler");
+const { init } = require("./init");
 
 function getHelpMessage() {
-  return `usage: htmc compile -i src/index.html -o dist
+  return `usage:
+
+htmc init
+htmc compile -i src/index.html -o dist
 
 options:
 
@@ -27,53 +31,65 @@ function main() {
   }
 
   const [command, ...options] = params;
-  if (command !== "compile") {
-    console.error(`htmc error: unexpected command: ${command}`);
-    return;
-  }
 
-  let input = "src/index.html";
-  let output = "dist";
+  switch (command) {
+    case "init": {
+      if (options.length) {
+        console.error(`htmc error: input: unexpected option ${options}`);
+        return;
+      }
+      init();
+      break;
+    }
+    case "compile": {
+      let input = "src/index.html";
+      let output = "dist";
 
-  /** @type {string[]} */
-  const unexpectedOptions = [];
-  while (options.length) {
-    const option = options.shift();
-    switch (option) {
-      case "-i":
-      case "--input": {
-        const arg = options.shift();
-        if (!arg) {
-          console.error(`htmc error: compile: input is not defined`);
-          return;
+      /** @type {string[]} */
+      const unexpectedOptions = [];
+      while (options.length) {
+        const option = options.shift();
+        switch (option) {
+          case "-i":
+          case "--input": {
+            const arg = options.shift();
+            if (!arg) {
+              console.error(`htmc error: compile: input is not defined`);
+              return;
+            }
+            input = arg;
+            break;
+          }
+          case "-o":
+          case "--output": {
+            const arg = options.shift();
+            if (!arg) {
+              console.error(`htmc error: compile: input is not defined`);
+              return;
+            }
+            output = arg;
+            break;
+          }
+          default: {
+            if (option) {
+              unexpectedOptions.push(option);
+            }
+          }
         }
-        input = arg;
-        break;
       }
-      case "-o":
-      case "--output": {
-        const arg = options.shift();
-        if (!arg) {
-          console.error(`htmc error: compile: input is not defined`);
-          return;
-        }
-        output = arg;
-        break;
+
+      if (unexpectedOptions.length) {
+        console.error(`htmc error: compile: unexpected option: ${unexpectedOptions}`);
+        return;
       }
-      default: {
-        if (option) {
-          unexpectedOptions.push(option);
-        }
-      }
+
+      compile(input, output);
+      break;
+    }
+    default: {
+      console.error(`htmc error: unexpected command: ${command}`);
     }
   }
-
-  if (unexpectedOptions.length) {
-    console.error(`htmc error: compile: unexpected option: ${unexpectedOptions}`);
-    return;
-  }
-
-  compile(input, output);
 }
 
 main();

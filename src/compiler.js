@@ -5,7 +5,7 @@ const CSS = require("css");
 const CSSWhat = require("css-what");
 const assert = require("./assert");
 
-let unicId = 1;
+let unicId = 0;
 function getUnicId() {
   return `_htmc-${unicId++}`;
 }
@@ -60,6 +60,7 @@ function createFile(file, content) {
  * @returns {Node}
  */
 function getNode(filePath, element) {
+  const id = getUnicId();
   const dirPath = filePath.split("/").slice(0, -1).join("/");
 
   let name = "";
@@ -102,7 +103,7 @@ function getNode(filePath, element) {
     }
   }
 
-  return { id: getUnicId(), name, style, imports, element };
+  return { id, name, style, imports, element };
 }
 
 /**

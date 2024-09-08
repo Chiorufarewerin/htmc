@@ -1,34 +1,18 @@
-.typing {
-  height: 10rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.content {
+  width: 100%;
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 0 2rem;
 }
 
-.typing-effect {
-  width: 21ch;
-  animation:
-    app-home-typing 2s steps(21),
-    app-home-typing-effect 0.5s step-end infinite alternate;
-  white-space: nowrap;
-  overflow: hidden;
-  border-right: 3px solid;
-  font-family: monospace;
-  font-size: 2rem;
+h3:not(:first-child) {
+  padding-top: 2rem;
 }
 
-.typing-effect::after {
-  content: "if you need just HTML";
+p {
+  padding-top: 1rem;
 }
 
-@keyframes app-home-typing {
-  from {
-    width: 0;
-  }
-}
-
-@keyframes app-home-typing-effect {
-  50% {
-    border-color: transparent;
-  }
+pre {
+  margin-top: 0.5rem;
 }

@@ -9,7 +9,8 @@ The tool that allows you to generate a static HTML site from different structure
 ## Usage
 
 ```
-usage: htmc compile -i src/index.html -o dist
+htmc init
+htmc compile
 
 options:
 
@@ -32,4 +33,4 @@ Please make sure to update tests as appropriate.
 
 ## License
 
-[MIT](https://choosealicense.com/licenses/mit/)
+[MIT](https://github.com/Chiorufarewerin/htmc/blob/main/LICENSE)

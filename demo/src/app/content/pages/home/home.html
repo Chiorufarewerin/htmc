@@ -1,7 +1,34 @@
 <!-- prettier-ignore -->
 @name 'app-home';
 @style './home.css';
+@import './typing/typing.html';
 
-<div class="typing">
-  <div class="typing-effect"></div>
+<div app-typing></div>
+
+<div class="content">
+  <h3>Introduction</h3>
+  <p>The tool that allows you to generate a static HTML site from different structured parts.</p>
+  <p>
+    Many frameworks provide you generating websites with JavaScript. But what if you don't need it? What if you want to
+    structure your HTML on differents parts or let's say components? So this instrument can help you.
+  </p>
+  <p>
+    The syntax of HTML templates and CSS was inspired by <a href="https://angular.dev/" target="_blank">angular</a>.
+  </p>
+
+  <h3>Quick start</h3>
+  <pre>
+npm install -g htmc-cli@latest
+npx htmc init
+  </pre>
+  <p>In the current folder will be generated the initial file structure below:</p>
+  <pre>
+- src/index.html
+- src/style.css
+- src/favicon.ico
+- src/assets/.gitkeep
+- src/app/content/content.html
+- src/app/content/content.css
+  </pre>
+  <p>More details in the <a href="#docs">docs</a> section.</p>
 </div>
