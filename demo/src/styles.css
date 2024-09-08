@@ -39,6 +39,9 @@ body {
   font-family: sans-serif;
   background-color: var(--background-base);
   color: var(--text-primary);
+  min-height: 100dvh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
 }
 
 pre {

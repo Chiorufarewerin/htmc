@@ -1,4 +1,10 @@
 :host {
+  margin-top: 1rem;
+  color: var(--text-secondary);
+  background-color: var(--background-neutral);
+}
+
+div {
   height: 4rem;
   width: 100%;
   max-width: 72rem;
@@ -7,5 +13,4 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text-secondary);
 }

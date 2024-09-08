@@ -6,6 +6,30 @@ The tool that allows you to generate a static HTML site from different structure
 
 `npm install -g htmc-cli@latest`
 
+## Quick setup
+
+`npx htmc init`
+
+In the current folder will be generated the initial file structure below:
+
+```
+- src/index.html
+- src/style.css
+- src/favicon.ico
+- src/assets/.gitkeep
+- src/app/content/content.html
+- src/app/content/content.css
+```
+
+Then you can run: `npx htmc compile`. It will compile this app into **dist** folder.
+
+You can use **http-server** to run this app:
+
+```
+npm install -g http-server
+npx http-server dist
+```
+
 ## Usage
 
 ```
