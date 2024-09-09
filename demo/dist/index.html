@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>HTMC - html compiler</title>
+    <base href="" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <meta name="title" content="HTMC" />
+    <meta name="description" content="html compiler" />
+
+    <link rel="shortcut icon" href="favicon.ico" />
+
+    <meta name="theme-color" content="#ffffff" />
+    <style>
+      :root {
+        --background-base: #fff;
+        --background-base-alt: #f6f6f6;
+        --background-neutral: rgb(0 0 0 / 4%);
+        --background-neutral-hover: rgb(0 0 0 / 8%);
+        --background-neutral-pressed: rgba(0, 0, 0, 0.12);
+        --text-primary: rgb(27 31 59 / 100%);
+        --text-secondary: rgb(27 31 59 / 65%);
+        --text-tertiary: rgb(27 31 59 / 40%);
+        --box-shadow: rgba(0, 0, 0, 0.1);
+        --dark-mode-symbol: "🌙";
+      }
+
+      :root:has(#dark-mode:checked) {
+        --background-base: #222;
+        --background-base-alt: #333;
+        --background-neutral: rgb(255 255 255 / 8%);
+        --background-neutral-hover: rgb(255 255 255 / 16%);
+        --background-neutral-pressed: rgb(255 255 255 / 24%);
+        --text-primary: rgb(255 255 255 / 100%);
+        --text-secondary: rgb(255 255 255 / 72%);
+        --text-tertiary: rgb(255 255 255 / 60%);
+        --box-shadow: rgba(223, 223, 223, 0.1);
+        --dark-mode-symbol: "☀️";
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --background-base: #222;
+          --background-base-alt: #333;
+          --background-neutral: rgb(255 255 255 / 8%);
+          --background-neutral-hover: rgb(255 255 255 / 16%);
+          --background-neutral-pressed: rgb(255 255 255 / 24%);
+          --text-primary: rgb(255 255 255 / 100%);
+          --text-secondary: rgb(255 255 255 / 72%);
+          --text-tertiary: rgb(255 255 255 / 60%);
+          --box-shadow: rgba(223, 223, 223, 0.1);
+          --dark-mode-symbol: "☀️";
+        }
+
+        :root:has(#dark-mode:checked) {
+          --background-base: #fff;
+          --background-base-alt: #f6f6f6;
+          --background-neutral: rgb(0 0 0 / 4%);
+          --background-neutral-hover: rgb(0 0 0 / 8%);
+          --background-neutral-pressed: rgba(0, 0, 0, 0.12);
+          --text-primary: rgb(27 31 59 / 100%);
+          --text-secondary: rgb(27 31 59 / 65%);
+          --text-tertiary: rgb(27 31 59 / 40%);
+          --box-shadow: rgba(0, 0, 0, 0.1);
+          --dark-mode-symbol: "🌙";
+        }
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      * {
+        margin: 0;
+      }
+
+      body {
+        font-family: sans-serif;
+        background-color: var(--background-base);
+        color: var(--text-primary);
+        min-height: 100dvh;
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+      }
+
+      pre {
+        scrollbar-color: hsla(0, 0%, 100%, 0.2);
+        background-color: hsl(0, 2%, 11%);
+        border-radius: 0.375rem;
+        color: hsl(0, 0%, 100%);
+        padding: 0.75rem;
+        padding-bottom: 0;
+      }
+
+      a {
+        color: currentColor;
+      }
+
+      section:not(#home, :target, :has(section:target)),
+      :root:has(section:target:not(#home)) #home {
+        display: none;
+      }
+
+      :is([app-header], app-header)[_htmc-1] {
+        position: sticky;
+        display: flex;
+        align-items: center;
+        top: -3rem;
+        height: 6rem;
+        background-color: var(--background-base-alt);
+        box-shadow: 0 2px 10px 0 var(--box-shadow);
+      }
+
+      .wrapper[_htmc-1] {
+        position: sticky;
+        top: 0;
+        width: 100%;
+        display: flex;
+        justify-content: end;
+        align-items: center;
+        gap: 1rem;
+        height: 3rem;
+        padding: 0 2rem;
+        max-width: 72rem;
+        margin: 0 auto;
+      }
+
+      img[_htmc-1] {
+        max-height: 80%;
+        margin-right: auto;
+      }
+
+      nav[_htmc-1] {
+        display: flex;
+        gap: 0.75rem;
+      }
+
+      a[_htmc-1] {
+        position: relative;
+        padding: 0.5rem;
+        border-radius: 0.75rem;
+        text-decoration: none;
+        font-family: "Roboto", "Segoe UI", "Helvetica Neue", sans-serif;
+        font-weight: bold;
+      }
+
+      a[_htmc-1]:after {
+        transition: 0.25s ease;
+        content: "";
+        display: block;
+        width: 100%;
+        height: 2px;
+        background-color: currentcolor;
+        transform: scalex(0);
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+      }
+
+      a[_htmc-1]:hover:after {
+        transform: scalex(1);
+      }
+
+      :is([app-dark-mode], app-dark-mode)[_htmc-2] {
+        position: relative;
+        padding: 0.375rem;
+      }
+
+      :is([app-dark-mode], app-dark-mode)[_htmc-2]:before {
+        content: var(--dark-mode-symbol);
+        font-size: 1rem;
+        visibility: hidden;
+      }
+
+      input[_htmc-2] {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 0;
+        height: 0;
+      }
+
+      input[_htmc-2]:before {
+        content: var(--dark-mode-symbol);
+        font-size: 1rem;
+        display: inline-block;
+        padding: 0.375rem;
+        background-color: var(--background-neutral);
+        border-radius: 50%;
+        cursor: pointer;
+        transition: 0.25s ease-in-out;
+      }
+
+      input[_htmc-2]:hover:before {
+        background-color: var(--background-neutral-hover);
+      }
+
+      input[_htmc-2]:active:before {
+        background-color: var(--background-neutral-pressed);
+      }
+
+      :is([app-content], app-content)[_htmc-3] {
+        margin-top: 2rem;
+      }
+
+      section[_htmc-3]::before {
+        content: "";
+        display: block;
+        position: relative;
+        width: 0;
+        height: 10rem;
+        margin-top: -10rem;
+      }
+
+      .content[_htmc-4] {
+        width: 100%;
+        max-width: 72rem;
+        margin: 0 auto;
+        padding: 0 2rem;
+      }
+
+      h3[_htmc-4]:not(:first-child) {
+        padding-top: 2rem;
+      }
+
+      p[_htmc-4] {
+        padding-top: 1rem;
+      }
+
+      pre[_htmc-4] {
+        margin-top: 0.5rem;
+      }
+
+      :is([app-typing], app-typing)[_htmc-5] {
+        height: 10rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .typing-effect[_htmc-5] {
+        width: 21ch;
+        animation:
+          app-typing 2s steps(21),
+          app-typing-effect 0.5s step-end infinite alternate;
+        white-space: nowrap;
+        overflow: hidden;
+        border-right: 3px solid;
+        font-family: monospace;
+        font-size: 2rem;
+      }
+
+      .typing-effect[_htmc-5]::after {
+        content: "if you need just HTML";
+      }
+
+      @keyframes app-typing {
+        from {
+          width: 0;
+        }
+      }
+
+      @keyframes app-typing-effect {
+        50% {
+          border-color: transparent;
+        }
+      }
+
+      :is([app-footer], app-footer)[_htmc-8] {
+        margin-top: 2.5rem;
+        color: var(--text-secondary);
+        background-color: var(--background-neutral);
+      }
+
+      div[_htmc-8] {
+        height: 4rem;
+        width: 100%;
+        max-width: 72rem;
+        margin: 0 auto;
+        padding: 0 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    </style>
+  </head>
+  <body>
+    <header app-header _htmc-1>
+      <div class="wrapper" _htmc-1>
+        <img alt="logo" src="assets/logo.png" _htmc-1 />
+
+        <nav _htmc-1>
+          <a href="#home" _htmc-1>Home</a>
+          <a href="#docs" _htmc-1>Docs</a>
+          <a href="#examples" _htmc-1>Examples</a>
+        </nav>
+
+        <div app-dark-mode _htmc-1 _htmc-2><input id="dark-mode" type="checkbox" _htmc-2 /></div>
+      </div>
+    </header>
+    <main app-content _htmc-3>
+      <section app-home id="home" _htmc-3 _htmc-4>
+        <div app-typing _htmc-4 _htmc-5><div class="typing-effect" _htmc-5></div></div>
+
+        <div class="content" _htmc-4>
+          <h3 _htmc-4>Introduction</h3>
+          <p _htmc-4>The tool that allows you to generate a static HTML site from different structured parts.</p>
+          <p _htmc-4>Many frameworks provide you generating websites with JavaScript. But what if you don't need it? What if you want to structure your HTML on differents parts or let's say components? So this instrument can help you.</p>
+          <p _htmc-4>The syntax of HTML templates and CSS was inspired by <a href="https://angular.dev/" target="_blank" _htmc-4>angular</a>.</p>
+
+          <h3 _htmc-4>Quick start</h3>
+          <pre _htmc-4>
+npm install -g htmc-cli@latest
+npx htmc init
+  </pre
+          >
+          <p _htmc-4>In the current folder will be generated the initial file structure below:</p>
+          <pre _htmc-4>
+- src/index.html
+- src/style.css
+- src/favicon.ico
+- src/assets/.gitkeep
+- src/app/content/content.html
+- src/app/content/content.css
+  </pre
+          >
+          <p _htmc-4>Then you can run:</p>
+          <pre _htmc-4>
+npx htmc compile
+  </pre
+          >
+          <p _htmc-4>It will compile this app into <b _htmc-4>dist</b> folder.</p>
+          <p _htmc-4>You can use <b _htmc-4>http-server</b> to run this app:</p>
+          <pre _htmc-4>
+npm install -g http-server
+npx http-server dist
+  </pre
+          >
+          <p _htmc-4>More details in the <a href="#docs" _htmc-4>docs</a> section.</p>
+        </div>
+      </section>
+      <section app-docs id="docs" _htmc-3 _htmc-6>
+        <p _htmc-6>docs</p>
+      </section>
+      <section app-examples id="examples" _htmc-3 _htmc-7>
+        <p _htmc-7>examples</p>
+      </section>
+    </main>
+    <footer app-footer _htmc-8>
+      <div _htmc-8>
+        <span _htmc-8>
+          Code licensed under an
+          <a href="https://github.com/Chiorufarewerin/htmc/blob/main/LICENSE" target="_blank" _htmc-8>MIT-style License</a>.
+        </span>
+      </div>
+    </footer>
+  </body>
+</html>
