@@ -8,14 +8,14 @@
   },
   "scripts": {
     "test": "tsc --noEmit && prettier . --check",
-    "compile-demo": "node src/index.js compile -i demo/src/index.html -o demo/dist",
+    "compile-docs": "node src/index.js compile -i docs-src/index.html -o docs",
     "watch": "npm-watch"
   },
   "watch": {
-    "compile-demo": {
+    "compile-docs": {
       "patterns": [
         "src",
-        "demo/src"
+        "docs-src"
       ],
       "extensions": "html,css,js"
     }
