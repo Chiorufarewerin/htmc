@@ -1,6 +1,6 @@
 {
   "name": "htmc-cli",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "The tool that allows you to generate a static HTML site from different structured parts.",
   "main": "src/index.js",
   "bin": {
