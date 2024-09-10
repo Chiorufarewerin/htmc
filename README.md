@@ -15,8 +15,7 @@ In the current folder will be generated the initial file structure below:
 ```
 - src/index.html
 - src/style.css
-- src/favicon.ico
-- src/assets/.gitkeep
+- src/public/favicon.ico
 - src/app/content/content.html
 - src/app/content/content.css
 ```

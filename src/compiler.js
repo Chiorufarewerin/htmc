@@ -254,16 +254,11 @@ function getHtmlRoot(root) {
  */
 function copyAssets(input, output) {
   const inputDir = input.split("/").slice(0, -1).join("/");
-  const faviconIcoSource = path.resolve(inputDir, "favicon.ico");
-  const assetsDirSource = path.resolve(inputDir, "assets");
-  const faviconIcoOutput = path.resolve(output, "favicon.ico");
-  const assetsDirOutput = path.resolve(output, "assets");
+  const publicDirPath = path.resolve(inputDir, "public");
+  const outputDirPatn = path.resolve(output);
 
-  if (fs.existsSync(faviconIcoSource)) {
-    fs.cpSync(faviconIcoSource, faviconIcoOutput);
-  }
-  if (fs.existsSync(assetsDirSource)) {
-    fs.cpSync(assetsDirSource, assetsDirOutput, { recursive: true });
+  if (fs.existsSync(publicDirPath)) {
+    fs.cpSync(publicDirPath, outputDirPatn, { recursive: true });
   }
 }
 
