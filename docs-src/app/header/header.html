@@ -1,10 +1,11 @@
 <!-- prettier-ignore -->
 @name 'app-header';
 @style './header.css';
+@import './logo/logo.html';
 @import './dark-mode/dark-mode.html';
 
 <div class="wrapper">
-  <img alt="logo" src="assets/logo.png" />
+  <div class="logo" app-logo></div>
 
   <nav>
     <a href="#">Home</a>
