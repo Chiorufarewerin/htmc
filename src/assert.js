@@ -4,11 +4,12 @@ class AssertionError extends Error {
 
 /**
  * @param {unknown} condition
+ * @param {string | undefined} message
  * @returns {asserts condition}
  */
-function assert(condition) {
+function assert(condition, message = undefined) {
   if (!condition) {
-    throw new AssertionError();
+    throw new AssertionError(message);
   }
 }
 

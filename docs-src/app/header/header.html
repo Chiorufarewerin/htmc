@@ -1,8 +1,6 @@
-<!-- prettier-ignore -->
-@name 'app-header';
-@style './header.css';
-@import './logo/logo.html';
-@import './dark-mode/dark-mode.html';
+<styles from="./header.css" />
+<import from="./logo/logo.html" as="app-logo" />
+<import from="./dark-mode/dark-mode.html" as="app-dark-mode" />
 
 <div class="wrapper">
   <div class="logo" app-logo></div>

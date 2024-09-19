@@ -1,9 +1,7 @@
-<!-- prettier-ignore -->
-@name 'app-content';
-@style './content.css';
-@import './pages/home/home.html';
-@import './pages/docs/docs.html';
-@import './pages/examples/examples.html';
+<styles from="./content.css" />
+<import from="./pages/home/home.html" as="app-home" />
+<import from="./pages/docs/docs.html" as="app-docs" />
+<import from="./pages/examples/examples.html" as="app-examples" />
 
 <section app-home id="home"></section>
 <section app-docs id="docs"></section>

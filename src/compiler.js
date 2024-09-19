@@ -55,53 +55,50 @@ function createFile(file, content) {
  */
 
 /**
+ * @param {string} name
  * @param {string} filePath
  * @param {HTMLParser.HTMLElement} element
  * @returns {Node}
  */
-function getNode(filePath, element) {
+function getNode(name, filePath, element) {
   const id = getUnicId();
   const dirPath = filePath.split("/").slice(0, -1).join("/");
 
-  let name = "";
-  let style = "";
-  /** @type {Record<string, Node>} */
-  let imports = {};
+  const style = (() => {
+    const styleTags = element.getElementsByTagName("styles");
 
-  if (element.firstChild && element.firstChild instanceof HTMLParser.TextNode) {
-    /** @type {string[]} */
-    const content = [];
-    for (const row of element.firstChild.text.split("\n")) {
-      if (!row) {
-        continue;
-      }
+    let styles = "";
+    for (const styleTag of styleTags) {
+      const from = styleTag.attributes.from;
+      assert(from, `${filePath} styles from must be specified`);
+      styleTag.remove();
 
-      if (row.startsWith("@")) {
-        if (row.startsWith("@name")) {
-          name = row.split("'")[1];
-        } else if (row.startsWith("@style")) {
-          const file = row.split("'")[1].replace("./", "");
-          style = getFileContent(`${dirPath}/${file}`);
-        } else if (row.startsWith("@import")) {
-          const file = row.split("'")[1].replace("./", "");
-          const content = getFileContent(`${dirPath}/${file}`);
-          const node = getNode(`${dirPath}/${file}`, HTMLParser.parse(content));
-          imports[node.name] = node;
-        } else {
-          throw Error(`Unexpected property: ${row}`);
-        }
-        continue;
-      }
-      if (row) {
-        content.push(row);
-      }
+      const file = from.replace("./", "");
+      styles += getFileContent(`${dirPath}/${file}`);
     }
-    if (content.length) {
-      element.firstChild.rawText = content.join("\n");
-    } else {
-      element.firstChild.remove();
+    return styles;
+  })();
+
+  const imports = (() => {
+    const importTags = element.getElementsByTagName("import");
+
+    /** @type {Record<string, Node>} */
+    const importRecord = {};
+
+    for (const importTag of importTags) {
+      const from = importTag.attributes.from;
+      const as = importTag.attributes.as;
+      assert(from, `${filePath} import from must be specified`);
+      assert(as, `${filePath} import as must be specified`);
+      importTag.remove();
+
+      const file = from.replace("./", "");
+      const content = getFileContent(`${dirPath}/${file}`);
+      importRecord[as] = getNode(as, `${dirPath}/${file}`, HTMLParser.parse(content));
     }
-  }
+
+    return importRecord;
+  })();
 
   return { id, name, style, imports, element };
 }
@@ -269,7 +266,7 @@ function copyAssets(input, output) {
  */
 function compile(input, output) {
   const content = getFileContent(input);
-  const root = getNode(input, HTMLParser.parse(content));
+  const root = getNode("root", input, HTMLParser.parse(content));
 
   const headElement = root.element.getElementsByTagName("head")[0];
   assert(headElement);
