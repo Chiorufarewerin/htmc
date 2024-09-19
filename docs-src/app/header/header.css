@@ -57,3 +57,7 @@ a:after {
 a:hover:after {
   transform: scalex(1);
 }
+
+.github {
+  height: 69%;
+}

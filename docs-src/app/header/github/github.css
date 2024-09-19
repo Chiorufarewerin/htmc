@@ -1,0 +1,8 @@
+a {
+  transition: color 0.25s ease;
+  color: var(--text-secondary);
+}
+
+a:hover {
+  color: var(--text-primary);
+}
